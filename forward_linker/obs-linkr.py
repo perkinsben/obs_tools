@@ -10,7 +10,7 @@ obsidian_home = ''
 def link_title(title, txt):
     updated_txt = txt
     # find instances of the title where it's not surrounded by [] or other letters
-    m = re.search('(?<!([\[\w\|]))' + title.lower() + '(?!([\]\w]))', txt.lower(), 1) # get 1 match at a time
+    m = re.search('(?<!([\[\w\|]))' + re.escape(title.lower()) + '(?!([\]\w]))', txt.lower(), 1) # get 1 match at a time
     if (m):
         # get the original text to link
         txt_to_link = txt[m.start():m.end()]
