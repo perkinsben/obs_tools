@@ -10,6 +10,14 @@ This script does the following:
 - Replaces the text with the link (includes handling of differing case)
 - Pushes the linked text back to the clipboard
 
+## Requirements
+
+* Python 3 + pip
+* [Pyperclip](https://pypi.org/project/pyperclip/)
+* [PyYAML](https://pypi.org/project/PyYAML/)
+
+```pip install pyperclip pyyaml```
+
 ## Running
 
 ```python obs-linkr.py {path to obsidian vault root}```
