@@ -1,10 +1,12 @@
-# pip install pyperclip
+# pip install pyperclip pyyaml
 import pyperclip
+import yaml
 import sys
 import os
 import re
 
 page_titles = []
+page_aliases = {}
 obsidian_home = ''
 
 def link_title(title, txt):
@@ -15,7 +17,9 @@ def link_title(title, txt):
         # get the original text to link
         txt_to_link = txt[m.start():m.end()]
         #print(txt_to_link)
-        # handle the display casing if it doesn't match
+        # handle aliases
+        if (title in page_aliases): title = page_aliases[title]
+        # handle the display text if it doesn't match the page title
         if (txt_to_link != title): title = title + '|' + txt_to_link
         # create the link and update our text
         updated_txt = txt[:m.start()] + '[[' + title + ']]' + txt[m.end():]
@@ -50,6 +54,27 @@ for root, dirs, files in os.walk(obsidian_home):
             page_title = re.sub(r'\.md$', '', file)
             print(page_title)
             page_titles.append(page_title)
+
+# we'll also check for an aliases file and load that
+# we pivot (invert) the dict for lookup purposes
+aliases_file = obsidian_home + "/aliases.yml"
+if os.path.isfile(aliases_file):
+    with open(aliases_file, 'r') as stream:
+        try:
+            aliases = yaml.full_load(stream)
+            
+            for title in aliases:
+                #print(title)
+                for alias in aliases[title]:
+                    page_aliases[alias] = title
+            #print(page_aliases)
+        except yaml.YAMLError as exc:
+            print(exc)
+            exit()
+
+# append our aliases to the list of titles
+for alias in page_aliases:
+    page_titles.append(alias)
 
 # sort from longest to shortest page titles so that we don't
 # identify scenarios where a page title is a subset of another
