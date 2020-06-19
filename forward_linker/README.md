@@ -67,3 +67,7 @@ Input text:
 
 Output text:
 ```In order to properly [[problem solving|problem solve]], you should wear your [[problem solving|Problem Solving]] Hat.```
+
+## Notes
+
+This tool leverages an opinionated use case of Obsidian. Those who use literal text titles to identify their notes will find more utility than those who don't (eg. the zettelkasten folks). If you have duplicated titles in your vault (ie. Obsidian prefixed them with a folder name due to ambiguity) you’ll only get links to the original (unqualified) page with that title.
