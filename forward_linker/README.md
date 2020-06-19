@@ -13,7 +13,7 @@ This script does the following:
 ## Requirements
 
 * Python 3 + pip
-* [Pyperclip](https://pypi.org/project/pyperclip/)
+* [Pyperclip](https://pypi.org/project/pyperclip/) - Note that Mac and Linux may require installation of additional modules as per docs
 * [PyYAML](https://pypi.org/project/PyYAML/)
 
 ```pip install pyperclip pyyaml```
