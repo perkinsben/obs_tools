@@ -12,7 +12,7 @@ obsidian_home = ''
 def link_title(title, txt):
     updated_txt = txt
     # find instances of the title where it's not surrounded by [] or other letters
-    m = re.search('(?<!([\[\w\|]))' + re.escape(title.lower()) + '(?!([\]\w]))', txt.lower(), 1) # get 1 match at a time
+    m = re.search('(?<!([\[\w\|]))' + re.escape(title.lower()) + '(?!([\|\]\w]))', txt.lower(), 1) # get 1 match at a time
     if (m):
         # get the original text to link
         txt_to_link = txt[m.start():m.end()]
@@ -85,19 +85,24 @@ print('----------------------')
 for page_title in page_titles:
     # if we have a case-insenitive title match...
     if page_title.lower() in clip_low:        
-        print('found %s in text' % page_title)
         # track whether we still have unlinked references to process
         unlinked_refs_remain = True
+        
+        # track whether we have linked the term
+        matched_one = False
         
         # keep attempting to match titles until we're done
         while unlinked_refs_remain:
             updated_txt = link_title(page_title, clip_txt)            
             # we can tell whether we're finished by testing whether
             # the linking process changed the updated text length
-            if len(updated_txt) == len(clip_txt):
+            if len(updated_txt) == len(clip_txt):                
                 unlinked_refs_remain = False
             else:
                 clip_txt = updated_txt
+                if not matched_one:
+                    print("linked %s" % page_title)
+                    matched_one = True                
 
         # lowercase our updated text for the next round of search
         clip_low = clip_txt.lower()        
