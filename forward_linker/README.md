@@ -51,6 +51,17 @@ Note Title:
 - alias 3
 ```
 
+You can also use aliases.yml to exclude linking of pages by adding a blank alias entry for the title:
+
+```
+Note Title to Ignore:
+-
+- alias 1
+- alias 2
+```
+
+Note that aliases are still matched (if provided), even when the title page is excluded.
+
 #### Example
 
 Assuming you had a file in your vault named ```problem solving.md```

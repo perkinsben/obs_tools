@@ -65,9 +65,16 @@ if os.path.isfile(aliases_file):
             
             for title in aliases:
                 #print(title)
-                for alias in aliases[title]:
-                    page_aliases[alias] = title
-            #print(page_aliases)
+                if aliases[title]:                  
+                    for alias in aliases[title]:
+                        if alias:
+                            page_aliases[alias] = title
+                        else:
+                            # empty entry will signal to ignore page title in matching
+                            print("Empty alias (will be ignored): " + title)
+                            if title in page_titles:
+                                page_titles.remove(title)
+                #print(page_aliases)
         except yaml.YAMLError as exc:
             print(exc)
             exit()
