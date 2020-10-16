@@ -1,0 +1,81 @@
+{
+  "main": {
+    "id": "de2fcbbc29982544",
+    "type": "split",
+    "children": [
+      {
+        "id": "34c58aa620dc3f58",
+        "type": "leaf",
+        "active": true,
+        "state": {
+          "type": "markdown",
+          "state": {
+            "file": "Interesting Testing Obsidian Linking Observations.md",
+            "mode": "source"
+          }
+        }
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "9f3819a3bee5188a",
+    "type": "split",
+    "children": [
+      {
+        "id": "cd1fb5f302590492",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "2c0a8fa8a26f6b28",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {}
+            }
+          },
+          {
+            "id": "ceb94144ef741633",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": ""
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "c4617c5acd2c8977",
+    "type": "split",
+    "children": [
+      {
+        "id": "7f3062f4270832b3",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "5436c34e45834766",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "Interesting Testing Obsidian Linking Observations.md"
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "lastOpenFiles": [
+    "Untitled.md"
+  ]
+}
