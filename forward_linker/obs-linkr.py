@@ -11,20 +11,31 @@ obsidian_home = ''
 
 def link_title(title, txt):
     updated_txt = txt
-    # find instances of the title where it's not surrounded by [] or other letters
-    m = re.search('(?<!([\[\w\|]))' + re.escape(title.lower()) + '(?!([\|\]\w]))', txt.lower(), 1) # get 1 match at a time
-    if (m):
-        # get the original text to link
-        txt_to_link = txt[m.start():m.end()]
-        #print(txt_to_link)
-        # handle aliases
-        if (title in page_aliases): title = page_aliases[title]
-        # handle the display text if it doesn't match the page title
-        if (txt_to_link != title): title = title + '|' + txt_to_link
-        # create the link and update our text
-        updated_txt = txt[:m.start()] + '[[' + title + ']]' + txt[m.end():]
+    # find instances of the title where it's not surrounded by [], | or other letters
+    matches = re.finditer('(?<!([\[\w\|]))' + re.escape(title.lower()) + '(?!([\|\]\w]))', txt.lower())
+    offset = 0 # track the offset of our matches (start index) due to document modifications
     
-    #print(updated_txt)
+    for m in matches:
+        # get the original text to link
+        txt_to_link = updated_txt[m.start() + offset:m.end() + offset]
+        
+        # where is the next ]]?
+        next_closing_index = updated_txt.find("]]", m.end() + offset)
+        # where is the next [[?
+        next_opening_index = updated_txt.find("[[", m.end() + offset)   
+        
+        # only proceed to link if our text is not already enclosed in a link
+        if (next_opening_index == -1) or (next_opening_index < next_closing_index):
+            updated_title = title
+            # handle aliases
+            if (title in page_aliases): updated_title = page_aliases[title]
+            # handle the display text if it doesn't match the page title
+            if (txt_to_link != updated_title): updated_title += '|' + txt_to_link
+            # create the link and update our text
+            updated_txt = updated_txt[:m.start() + offset] + '[[' + updated_title + ']]' + updated_txt[m.end() + offset:]
+            # change our offset due to modifications to the document
+            offset = offset + (len(updated_title) + 4 - len(txt_to_link)) # pairs of double brackets adds 4 chars
+            
     return updated_txt
 
 # validate obsidian vault location
@@ -92,24 +103,12 @@ print('----------------------')
 for page_title in page_titles:
     # if we have a case-insenitive title match...
     if page_title.lower() in clip_low:        
-        # track whether we still have unlinked references to process
-        unlinked_refs_remain = True
-        
-        # track whether we have linked the term
-        matched_one = False
-        
-        # keep attempting to match titles until we're done
-        while unlinked_refs_remain:
-            updated_txt = link_title(page_title, clip_txt)            
-            # we can tell whether we're finished by testing whether
-            # the linking process changed the updated text length
-            if len(updated_txt) == len(clip_txt):                
-                unlinked_refs_remain = False
-            else:
-                clip_txt = updated_txt
-                if not matched_one:
-                    print("linked %s" % page_title)
-                    matched_one = True                
+        updated_txt = link_title(page_title, clip_txt)            
+        # we can tell whether we've matched the term if
+        # the linking process changed the updated text length
+        if len(updated_txt) != len(clip_txt):
+            clip_txt = updated_txt
+            print("linked %s" % page_title)
 
         # lowercase our updated text for the next round of search
         clip_low = clip_txt.lower()        
