@@ -83,6 +83,4 @@ Output text:
 
 This tool leverages an opinionated use case of Obsidian. Those who use literal text titles to identify their notes will find more utility than those who don't (eg. the zettelkasten folks), but using the aliases file strategically can handle a wide range of matching scenarios. If you have duplicated titles in your vault (ie. Obsidian prefixed them with a folder name due to ambiguity) you’ll only get links to the original (unqualified) page with that title.  
 
-There are certain scenarios where links can become nested (eg. "Learning" is linked inside "Machine Learning Concepts"). Incorrect links like this are scrubbed from the finished text ("scrubbing link..." will appear in the console).  
-
 Spec04 wrote a python script that generates the aliases.yml file from tags within your note files: [Obsidian Alias File Generator](https://github.com/Spec04/obs_alias_generator)

@@ -35,7 +35,7 @@ def link_title(title, txt):
             updated_txt = updated_txt[:m.start() + offset] + '[[' + updated_title + ']]' + updated_txt[m.end() + offset:]
             # change our offset due to modifications to the document
             offset = offset + (len(updated_title) + 4 - len(txt_to_link)) # pairs of double brackets adds 4 chars
-
+            
     return updated_txt
 
 # validate obsidian vault location
@@ -99,7 +99,7 @@ for alias in page_aliases:
 page_titles = sorted(page_titles, key=lambda x: len(x), reverse=True)
 print('----------------------')
 
-# iterate through our page titles
+## iterate through our page titles
 for page_title in page_titles:
     # if we have a case-insenitive title match...
     if page_title.lower() in clip_low:        
