@@ -27,38 +27,6 @@ def link_title(title, txt):
     #print(updated_txt)
     return updated_txt
 
-# the regex to identify links is smart enough that it can detect whether text
-# being linked has [[, ]] or | adjacent to it and skip, but there are cases that it
-# can't detect (eg. given the following page titles: "Learning", "Great Learning Plan")
-# and text "see my Great Learning Plan", the script (by default) would link as:
-# "see my [[Great [[Learning]] Plan]]"
-# because "Learning" looks to the tool to be a unique term (no [[, ]] or | adjacent)
-# we use the following method to scrub any instances of these from our document
-# due to the matching algorithm, this is the best/easiest way to accomplish this
-def scrub_nested_links(txt):
-    updated_txt = txt
-    
-    # find all instances of [[
-    for m in re.finditer("\[\[", updated_txt):
-        # where is the next ]]?
-        next_closing_index = updated_txt.find("]]", m.end())
-        # where is the next [[?
-        next_opening_index = updated_txt.find("[[", m.end())    
-        
-        # if there is another [[ that appears before the next ]], we need to scrub the nested link
-        if (next_opening_index > -1) and (next_opening_index < next_closing_index):         
-            print("scrubbing link " + updated_txt[m.start():next_closing_index + 2] + "...")
-            # snip out the bad link
-            nested_link = updated_txt[next_opening_index + 2:next_closing_index]
-            # handle piped display syntax if present
-            if ("|" in nested_link): nested_link = nested_link[nested_link.index("|") + 1:]            
-            # update our text with the nested link scrubbed
-            updated_txt = updated_txt[:next_opening_index] + nested_link + updated_txt[next_closing_index + 2:]
-            # recursively call this method until there are no more nested links
-            updated_txt = scrub_nested_links(updated_txt)
-    
-    return updated_txt
-
 # validate obsidian vault location
 if (len(sys.argv) > 1):
     obsidian_home = sys.argv[1]
@@ -120,7 +88,7 @@ for alias in page_aliases:
 page_titles = sorted(page_titles, key=lambda x: len(x), reverse=True)
 print('----------------------')
 
-# iterate through our page titles
+## iterate through our page titles
 for page_title in page_titles:
     # if we have a case-insenitive title match...
     if page_title.lower() in clip_low:        
@@ -145,9 +113,6 @@ for page_title in page_titles:
 
         # lowercase our updated text for the next round of search
         clip_low = clip_txt.lower()        
-
-# we might have some incorrect nested matches - let's scrub them
-clip_txt = scrub_nested_links(clip_txt)
 
 # send the linked text to the clipboard            
 pyperclip.copy(clip_txt)
