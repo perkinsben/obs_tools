@@ -8,6 +8,7 @@ import re
 page_titles = []
 page_aliases = {}
 obsidian_home = ''
+wikipedia_mode = False
 
 def link_title(title, txt):
     updated_txt = txt
@@ -35,6 +36,8 @@ def link_title(title, txt):
             updated_txt = updated_txt[:m.start() + offset] + '[[' + updated_title + ']]' + updated_txt[m.end() + offset:]
             # change our offset due to modifications to the document
             offset = offset + (len(updated_title) + 4 - len(txt_to_link)) # pairs of double brackets adds 4 chars
+            # if wikipedia mode is on, return after first link is created
+            if wikipedia_mode: return updated_txt
             
     return updated_txt
 
@@ -44,8 +47,14 @@ if (len(sys.argv) > 1):
     if not os.path.isdir(obsidian_home):
         print('folder specified is not valid')
         exit()
+        
+    # check for wikipedia mode flag
+    if (len(sys.argv) > 2):
+        if (sys.argv[2]) == "-w":
+            wikipedia_mode = True
 else:
-    print("usage - python obs-link.py [path to obsidian vault]")
+    print("usage - python obs-link.py <path to obsidian vault> [-w]")
+    print("-w = only the first occurrence of a page title (or alias) will be linked ('wikipedia mode')")
     exit()
 
 # get text from clipboard

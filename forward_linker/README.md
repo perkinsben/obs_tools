@@ -20,7 +20,8 @@ This script does the following:
 
 ## Running
 
-```python obs-linkr.py {path to obsidian vault root}```
+```python obs-linkr.py <path to obsidian vault root> [-w]```
+```-w = only the first occurrence of a page title (or alias) will be linked ('wikipedia mode')```
 
 ## Example
 
