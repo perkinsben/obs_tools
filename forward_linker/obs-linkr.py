@@ -9,6 +9,7 @@ page_titles = []
 page_aliases = {}
 obsidian_home = ''
 wikipedia_mode = False
+paragraph_mode = False
 
 def link_title(title, txt):
     updated_txt = txt
@@ -41,6 +42,27 @@ def link_title(title, txt):
             
     return updated_txt
 
+def link_content(content):
+    # make a copy of our content and lowercase it for search purposes
+    content_low = content.lower()
+
+    # iterate through our page titles
+    for page_title in page_titles:
+        # if we have a case-insenitive title match...
+        if page_title.lower() in content_low:        
+            updated_txt = link_title(page_title, content)            
+            # we can tell whether we've matched the term if
+            # the linking process changed the updated text length
+            if len(updated_txt) != len(content):
+                content = updated_txt
+                print("linked %s" % page_title)
+
+            # lowercase our updated text for the next round of search
+            content_low = content.lower()        
+    
+    return content
+
+# main entry point
 # validate obsidian vault location
 if (len(sys.argv) > 1):
     obsidian_home = sys.argv[1]
@@ -52,19 +74,15 @@ if (len(sys.argv) > 1):
     if (len(sys.argv) > 2):
         if (sys.argv[2]) == "-w":
             wikipedia_mode = True
+        if (sys.argv[2]) == "-p":
+            wikipedia_mode = True
+            paragraph_mode = True
+
 else:
-    print("usage - python obs-link.py <path to obsidian vault> [-w]")
-    print("-w = only the first occurrence of a page title (or alias) will be linked ('wikipedia mode')")
+    print("usage - python obs-link.py <path to obsidian vault> [-w / -p]")
+    print("-w = only the first occurrence of a page title (or alias) in the content will be linked ('wikipedia mode')")
+    print("-p = only the first occurrence of a page title (or alias) in each paragraph will be linked ('paragraph mode')")
     exit()
-
-# get text from clipboard
-clip_txt = pyperclip.paste()
-print('--- clipboard text ---')
-print(clip_txt)
-print('----------------------')
-
-# make a copy of it and lowercase it for search purposes
-clip_low = clip_txt.lower()
 
 # get a directory listing of obsidian *.md files
 # use it to build our list of titles
@@ -72,7 +90,7 @@ for root, dirs, files in os.walk(obsidian_home):
     for file in files:
         if file.endswith('.md'):
             page_title = re.sub(r'\.md$', '', file)
-            print(page_title)
+            #print(page_title)
             page_titles.append(page_title)
 
 # we'll also check for an aliases file and load that
@@ -106,24 +124,25 @@ for alias in page_aliases:
 # sort from longest to shortest page titles so that we don't
 # identify scenarios where a page title is a subset of another
 page_titles = sorted(page_titles, key=lambda x: len(x), reverse=True)
+
+# get text from clipboard
+clip_txt = pyperclip.paste()
+#print('--- clipboard text ---')
+#print(clip_txt)
 print('----------------------')
 
-## iterate through our page titles
-for page_title in page_titles:
-    # if we have a case-insenitive title match...
-    if page_title.lower() in clip_low:        
-        updated_txt = link_title(page_title, clip_txt)            
-        # we can tell whether we've matched the term if
-        # the linking process changed the updated text length
-        if len(updated_txt) != len(clip_txt):
-            clip_txt = updated_txt
-            print("linked %s" % page_title)
+# prepare our linked text output
+linked_txt = ""
 
-        # lowercase our updated text for the next round of search
-        clip_low = clip_txt.lower()        
+if (paragraph_mode):
+    for paragraph in clip_txt.split("\n"):
+        linked_txt += link_content(paragraph) + "\n"
+    linked_txt = linked_txt[:-1] # scrub the last newline
+else:
+    linked_txt = link_content(clip_txt)
 
-# send the linked text to the clipboard            
-pyperclip.copy(clip_txt)
+# send the linked text to the clipboard
+pyperclip.copy(linked_txt)
 #print(clip_txt)
 print('----------------------')
 print('linked text copied to clipboard')
