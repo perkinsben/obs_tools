@@ -22,7 +22,8 @@ This script does the following:
 
 ```python obs-linkr.py <path to obsidian vault root> [-w]```  
 
-```-w = only the first occurrence of a page title (or alias) will be linked ('wikipedia mode')```
+```-w = only the first occurrence of a page title (or alias) in the content will be linked ('wikipedia mode')```
+```-p = only the first occurrence of a page title (or alias) in each paragraph will be linked ('paragraph mode')```
 
 ## Example
 
