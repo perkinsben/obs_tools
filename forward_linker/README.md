@@ -88,3 +88,38 @@ Output text:
 This tool leverages an opinionated use case of Obsidian. Those who use literal text titles to identify their notes will find more utility than those who don't (eg. the zettelkasten folks), but using the aliases file strategically can handle a wide range of matching scenarios. If you have duplicated titles in your vault (ie. Obsidian prefixed them with a folder name due to ambiguity) you’ll only get links to the original (unqualified) page with that title.  
 
 Spec04 wrote a python script that generates the aliases.yml file from tags within your note files: [Obsidian Alias File Generator](https://github.com/Spec04/obs_alias_generator)
+
+---
+# Obsidian Unlinker
+
+This is a small utility to remove links in a block of text. It operates on the text in your clipboard. It is intended to work as a companion to the linker script that can quickly unlink blocks of text that are 'overlinked'.
+
+It scrubs links of the type:
+- ```[[this]] becomes this```
+- ```[[Great Page|that]] becomes that```
+
+It does not touch links of the type:
+- ```![[untouchable]]```
+- ```![this link](is safe)```
+- ```[so is](this one)```
+
+## Requirements
+
+* Python 3 + pip
+* [Pyperclip](https://pypi.org/project/pyperclip/) - Note that Mac and Linux may require installation of additional modules as per docs
+
+```pip install pyperclip```
+
+## Running
+
+```python obs-unlinkr.py```  
+
+## Example
+
+Assuming you had the following text in your clipboard:
+
+```[[Psychology]] is the [[Science]] of human [[Behavior|behavior]]. ![[Great Quote]]```
+
+After executing the script, it would be replaced with the following:
+
+```Psychology is the Science of human behavior. ![[Great Quote]]```
