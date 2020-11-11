@@ -123,3 +123,28 @@ Assuming you had the following text in your clipboard:
 After executing the script, it would be replaced with the following:
 
 ```Psychology is the Science of human behavior. ![[Great Quote]]```
+
+---
+# AutoHotKey Integration
+
+These scripts can integrate nicely with [AutoHotKey](https://www.autohotkey.com/) for Windows.
+
+Linking (Ctrl+L links selected text):
+```
+^l::
+Clipboard=
+Send ^c
+RunWait, cmd.exe /c python obs-linkr.py c:\path\to\your\vault, c:\scripts\obs_tools\forward_linker, Hide
+Send ^v
+```
+
+Unlinking (Ctrl+U unlinks selected text):
+```
+^u::
+Clipboard=
+Send ^c
+RunWait, cmd.exe /c python obs-unlinkr.py c:\path\to\your\vault, c:\scripts\obs_tools\forward_linker, Hide
+Send ^v
+```
+
+You'll have to modify the paths to match your own, and may need to add Python to your Windows %PATH%.
