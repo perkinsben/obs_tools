@@ -41,8 +41,9 @@ And the following text in your clipboard to import:
 After executing the script, it would be replaced with the following:
 
 ```[[Psychology]] is the [[Science]] of human [[Behavior|behavior]].```
+---
 
-## Aliases
+# Aliases
 
 You can use a file named aliases.yml in your vault root to broaden the title matching in your text to include aliases.
 
@@ -83,11 +84,25 @@ Input text:
 Output text:
 ```In order to properly [[problem solving|problem solve]], you should wear your [[problem solving|Problem Solving]] Hat.```
 
-## Notes
+## aliases.md
 
-This tool leverages an opinionated use case of Obsidian. Those who use literal text titles to identify their notes will find more utility than those who don't (eg. the zettelkasten folks), but using the aliases file strategically can handle a wide range of matching scenarios. If you have duplicated titles in your vault (ie. Obsidian prefixed them with a folder name due to ambiguity) you’ll only get links to the original (unqualified) page with that title.  
+In addition to defining aliases in aliases.yml, the tool also supports using aliases.md (also placed in vault root) as an alternative. If both files are present, aliases.md takes precedence. The format of both files is the same (described above), except aliases.md supports wikilinks in titles (see below).
 
-Spec04 wrote a python script that generates the aliases.yml file from tags within your note files: [Obsidian Alias File Generator](https://github.com/Spec04/obs_alias_generator)
+Using aliases.md provides some additional features:
+- The file can be opened in Obsidian and edited on-the-fly, repositioned, etc. (best viewed in edit mode)
+- The page titles can be linked, eg.:
+```
+[[problem solving]]:
+- solving problems
+- problem solve
+```
+- When page titles are linked, they will show in the backlinks section (linked mentions). This gives visibility into the aliases defined for a page being viewed (works best with 'Show more context' enabled in backlinks section).
+
+You may wish to exclude the aliases file itself from being linked during the auto-linking process by adding the following to aliases.md:
+```
+aliases:
+- 
+```
 
 ---
 # Obsidian Unlinker
@@ -148,3 +163,10 @@ Send ^v
 ```
 
 You'll have to modify the paths to match your own, and may need to add Python to your Windows %PATH%.
+
+---
+# Notes
+
+This tool leverages an opinionated use case of Obsidian. Those who use literal text titles to identify their notes will find more utility than those who don't (eg. the zettelkasten folks), but using the aliases file strategically can handle a wide range of matching scenarios. If you have duplicated titles in your vault (ie. Obsidian prefixed them with a folder name due to ambiguity) you’ll only get links to the original (unqualified) page with that title.  
+
+Spec04 wrote a python script that generates the aliases.yml file from tags within your note files: [Obsidian Alias File Generator](https://github.com/Spec04/obs_alias_generator)
