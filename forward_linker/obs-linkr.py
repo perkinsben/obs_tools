@@ -93,25 +93,37 @@ for root, dirs, files in os.walk(obsidian_home):
             #print(page_title)
             page_titles.append(page_title)
 
-# we'll also check for an aliases file and load that
+# we'll also check for an aliases file and load that (.md -> .yml)
 # we pivot (invert) the dict for lookup purposes
-aliases_file = obsidian_home + "/aliases.yml"
-if os.path.isfile(aliases_file):
+aliases_file = obsidian_home + "/aliases"
+
+if os.path.isfile(aliases_file + ".md"):
+    aliases_file += ".md"
+elif os.path.isfile(aliases_file + ".yml"):
+    aliases_file += ".yml"
+else:
+    aliases_file = None
+
+if aliases_file:
     with open(aliases_file, 'r') as stream:
         try:
-            aliases = yaml.full_load(stream)
+            # this line injects quotes around wikilinks so that yaml parsing won't fail
+            # we remove them later, so they are only a temporary measure
+            aliases_txt = stream.read().replace("[[", "\"[[").replace("]]", "]]\"")
+            aliases = yaml.full_load(aliases_txt)
             
-            for title in aliases:
-                #print(title)
+            for title in aliases:               
                 if aliases[title]:                  
                     for alias in aliases[title]:
+                        # strip out wikilinks and quotes from title if present
+                        sanitized_title = title.replace("[[", "").replace("]]", "").replace("\"", "")
                         if alias:
-                            page_aliases[alias] = title
+                            page_aliases[alias] = sanitized_title
                         else:
                             # empty entry will signal to ignore page title in matching
-                            print("Empty alias (will be ignored): " + title)
-                            if title in page_titles:
-                                page_titles.remove(title)
+                            print("Empty alias (will be ignored): " + sanitized_title)
+                            if sanitized_title in page_titles:
+                                page_titles.remove(sanitized_title)
                 #print(page_aliases)
         except yaml.YAMLError as exc:
             print(exc)
