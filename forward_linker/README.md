@@ -41,8 +41,8 @@ And the following text in your clipboard to import:
 After executing the script, it would be replaced with the following:
 
 ```[[Psychology]] is the [[Science]] of human [[Behavior|behavior]].```
----
 
+---
 # Aliases
 
 You can use a file named aliases.yml in your vault root to broaden the title matching in your text to include aliases.
