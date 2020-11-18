@@ -56,11 +56,11 @@ Note Title:
 - alias 3
 ```
 
-You can also use aliases.yml to exclude linking of pages by adding a blank alias entry for the title:
+You can also use aliases.yml to exclude linking of pages by adding a blank alias entry (dash + space) for the title:
 
 ```
 Note Title to Ignore:
--
+- 
 - alias 1
 - alias 2
 ```
