@@ -31,18 +31,21 @@ def link_title(title, txt):
         next_opening_index = updated_txt.find("[[", m.end() + offset)   
         
         # only proceed to link if our text is not already enclosed in a link
-        if (next_opening_index == -1) or (next_opening_index < next_closing_index):
-            updated_title = title
-            # handle aliases
-            if (title in page_aliases): updated_title = page_aliases[title]
-            # handle the display text if it doesn't match the page title
-            if (txt_to_link != updated_title): updated_title += '|' + txt_to_link
-            # create the link and update our text
-            updated_txt = updated_txt[:m.start() + offset] + '[[' + updated_title + ']]' + updated_txt[m.end() + offset:]
-            # change our offset due to modifications to the document
-            offset = offset + (len(updated_title) + 4 - len(txt_to_link)) # pairs of double brackets adds 4 chars
-            # if wikipedia mode is on, return after first link is created
-            if wikipedia_mode: return updated_txt
+        # don't link if there's a ]] ahead, but no [[ (can happen with first few links)
+        if not (next_opening_index == -1 and next_closing_index > -1):
+            # proceed to link if no [[ or ]] ahead (first link) or [[ appears before ]]
+            if ((next_opening_index == -1 and next_closing_index == -1) or (next_opening_index < next_closing_index)):
+                updated_title = title
+                # handle aliases
+                if (title in page_aliases): updated_title = page_aliases[title]
+                # handle the display text if it doesn't match the page title
+                if (txt_to_link != updated_title): updated_title += '|' + txt_to_link
+                # create the link and update our text
+                updated_txt = updated_txt[:m.start() + offset] + '[[' + updated_title + ']]' + updated_txt[m.end() + offset:]
+                # change our offset due to modifications to the document
+                offset = offset + (len(updated_title) + 4 - len(txt_to_link)) # pairs of double brackets adds 4 chars
+                # if wikipedia mode is on, return after first link is created
+                if wikipedia_mode: return updated_txt
             
     return updated_txt
 
