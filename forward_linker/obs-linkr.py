@@ -1,4 +1,5 @@
-# pip install pyperclip pyyaml
+# pip install pyperclip pyyaml python-frontmatter
+import frontmatter
 import pyperclip
 import yaml
 import sys
@@ -7,9 +8,12 @@ import re
 
 page_titles = []
 page_aliases = {}
+generated_aliases = {}
 obsidian_home = ''
 wikipedia_mode = False
 paragraph_mode = False
+yaml_mode = False
+regenerate_aliases = False
 
 def link_title(title, txt):
     updated_txt = txt
@@ -69,42 +73,67 @@ if (len(sys.argv) > 1):
     if not os.path.isdir(obsidian_home):
         print('folder specified is not valid')
         exit()
-        
-    # check for wikipedia mode flag
+    
+    # check for additional flags
     if (len(sys.argv) > 2):
-        if (sys.argv[2]) == "-w":
-            wikipedia_mode = True
-        if (sys.argv[2]) == "-p":
-            wikipedia_mode = True
-            paragraph_mode = True
+        for arg_index in range(2, len(sys.argv)):
+            flag = sys.argv[arg_index]
+
+            if (flag) == "-w":
+                wikipedia_mode = True
+            elif (flag) == "-p":
+                wikipedia_mode = True
+                paragraph_mode = True
+            elif (flag) == "-r":
+                regenerate_aliases = True
+            elif (flag) == "-y":
+                yaml_mode = True
 
 else:
-    print("usage - python obs-link.py <path to obsidian vault> [-w / -p]")
+    print("usage - python obs-link.py <path to obsidian vault> [-r] [-y] [-w / -p]")
+    print("-r = regenerate the aliases.md file using yaml frontmatter inside vault markdown files")
+    print("-y = use aliases.yml as aliases file instead of aliases.md")
     print("-w = only the first occurrence of a page title (or alias) in the content will be linked ('wikipedia mode')")
     print("-p = only the first occurrence of a page title (or alias) in each paragraph will be linked ('paragraph mode')")
     exit()
 
+aliases_file = obsidian_home + "/aliases" + (".yml" if yaml_mode else ".md")
+
 # get a directory listing of obsidian *.md files
-# use it to build our list of titles
+# use it to build our list of titles and aliases
 for root, dirs, files in os.walk(obsidian_home):
     for file in files:
         if file.endswith('.md'):
             page_title = re.sub(r'\.md$', '', file)
             #print(page_title)
             page_titles.append(page_title)
+            
+            # load yaml frontmatter and parse aliases
+            if (regenerate_aliases):
+                with open(root + "/" + file, encoding = "utf-8") as f:
+                    #print(file)        
+                    fm = frontmatter.load(f)
+                    
+                    if (fm and 'aliases' in fm):
+                        #print(fm['aliases'])
+                        generated_aliases[page_title] = fm['aliases']
 
-# we'll also check for an aliases file and load that (.md -> .yml)
+# if -r passed on command line, regenerate aliases.yml
+# this is only necessary if new aliases are present
+if (regenerate_aliases):
+    with open(aliases_file, "w", encoding = "utf-8") as af:
+        for title in generated_aliases:
+            af.write(title + ":\n" if yaml_mode else "[[" + title + "]]:\n")
+            #print(title)
+            for alias in generated_aliases[title]:
+                af.write("- " + alias + "\n")
+                #print(alias)
+            af.write("\n")
+        if not yaml_mode: af.write("aliases:\n- ")
+
+# load the aliases file
 # we pivot (invert) the dict for lookup purposes
-aliases_file = obsidian_home + "/aliases"
-
-if os.path.isfile(aliases_file + ".md"):
-    aliases_file += ".md"
-elif os.path.isfile(aliases_file + ".yml"):
-    aliases_file += ".yml"
-else:
-    aliases_file = None
-
-if aliases_file:
+if os.path.isfile(aliases_file):
     with open(aliases_file, 'r') as stream:
         try:
             # this line injects quotes around wikilinks so that yaml parsing won't fail
@@ -112,19 +141,20 @@ if aliases_file:
             aliases_txt = stream.read().replace("[[", "\"[[").replace("]]", "]]\"")
             aliases = yaml.full_load(aliases_txt)
             
-            for title in aliases:               
-                if aliases[title]:                  
-                    for alias in aliases[title]:
-                        # strip out wikilinks and quotes from title if present
-                        sanitized_title = title.replace("[[", "").replace("]]", "").replace("\"", "")
-                        if alias:
-                            page_aliases[alias] = sanitized_title
-                        else:
-                            # empty entry will signal to ignore page title in matching
-                            print("Empty alias (will be ignored): " + sanitized_title)
-                            if sanitized_title in page_titles:
-                                page_titles.remove(sanitized_title)
-                #print(page_aliases)
+            if (aliases):
+                for title in aliases:         
+                    if aliases[title]:                  
+                        for alias in aliases[title]:
+                            # strip out wikilinks and quotes from title if present
+                            sanitized_title = title.replace("[[", "").replace("]]", "").replace("\"", "")
+                            if alias:
+                                page_aliases[alias] = sanitized_title
+                            else:
+                                # empty entry will signal to ignore page title in matching
+                                print("Empty alias (will be ignored): " + sanitized_title)
+                                if sanitized_title in page_titles:
+                                    page_titles.remove(sanitized_title)
+                    #print(page_aliases)
         except yaml.YAMLError as exc:
             print(exc)
             exit()

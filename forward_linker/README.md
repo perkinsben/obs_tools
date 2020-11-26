@@ -3,7 +3,7 @@
 This script does the following:
 
 - Scans your vault location recursively for .md files and builds a list of note titles
-- Imports title aliases from aliases.yml in vault root
+- Optionally builds a list of title aliases by scanning YAML frontmatter in notes
 - Sorts the titles from longest to shortest
 - Pulls the text from your clipboard
 - Searches through that text for instances of the titles
@@ -15,12 +15,17 @@ This script does the following:
 * Python 3 + pip
 * [Pyperclip](https://pypi.org/project/pyperclip/) - Note that Mac and Linux may require installation of additional modules as per docs
 * [PyYAML](https://pypi.org/project/PyYAML/)
+* [Python Frontmatter](https://pypi.org/project/python-frontmatter/)
 
-```pip install pyperclip pyyaml```
+```pip install pyperclip pyyaml python-frontmatter```
 
 ## Running
 
-```python obs-linkr.py <path to obsidian vault root> [-w / -p]```  
+```python obs-linkr.py <path to obsidian vault root> [-r] [-y] [-w / -p]```  
+
+```-r = regenerate the aliases.md file using yaml frontmatter inside vault markdown files``` 
+
+```-y = use aliases.yml as aliases file instead of aliases.md```
 
 ```-w = only the first occurrence of a page title (or alias) in the content will be linked ('wikipedia mode')```  
 
@@ -45,64 +50,42 @@ After executing the script, it would be replaced with the following:
 ---
 # Aliases
 
-You can use a file named aliases.yml in your vault root to broaden the title matching in your text to include aliases.
+Aliases were introduced in Obsidian v0.9.16 and are defined in YAML frontmatter as described here: https://forum.obsidian.md/t/obsidian-release-v0-9-16/8795. Aliases are used when linking text so that alternate titles can link back to a central note.
 
-#### Format
+### Example
 
+problem solving.md:
 ```
-Note Title:
-- alias 1
-- alias 2
-- alias 3
-```
+---
+aliases: ["solving problems", "problem solve"]
+---
 
-You can also use aliases.yml to exclude linking of pages by adding a blank alias entry (dash + space) for the title:
-
-```
-Note Title to Ignore:
-- 
-- alias 1
-- alias 2
+...note content here...
 ```
 
-Note that aliases are still matched (if provided), even when the title page is excluded.
+If the '-r' flag is provided on the command line, the script will generate an aliases file by searching each file in the vault for frontmatter aliases. If the '-r' flag is not passed on the command line, the existing aliases file will be used. Using the '-r' flag can speed the linking process up if there are many notes in your vault, or no aliases have changed since the last time the aliases file was generated.
 
-#### Example
+## aliases.md vs aliases.yml
 
-Assuming you had a file in your vault named ```problem solving.md```
-
-aliases.yml:
-```
-problem solving:
-- solving problems
-- problem solve
-```
-
-Input text:
-```In order to properly problem solve, you should wear your Problem Solving Hat.```
-
-Output text:
-```In order to properly [[problem solving|problem solve]], you should wear your [[problem solving|Problem Solving]] Hat.```
-
-## aliases.md
-
-In addition to defining aliases in aliases.yml, the tool also supports using aliases.md (also placed in vault root) as an alternative. If both files are present, aliases.md takes precedence. The format of both files is the same (described above), except aliases.md supports wikilinks in titles (see below).
+By default, the script stores the parsed aliases in aliases.md at the root of the vault. You can choose to store the aliases in aliases.yml if desired by passing the '-y' flag on the commmand line. The format of both files is the same (standard YAML), except aliases.md supports wikilinks in titles (see below).
 
 Using aliases.md provides some additional features:
-- The file can be opened in Obsidian and edited on-the-fly, repositioned, etc. (best viewed in edit mode)
-- The page titles can be linked, eg.:
+- The file can be opened in Obsidian
+- All aliases defined in the vault are visible in one file
+- The page titles are linked for easy navigation to original alias definition, eg.:
 ```
 [[problem solving]]:
 - solving problems
 - problem solve
 ```
-- When page titles are linked, they will show in the backlinks section (linked mentions). This gives visibility into the aliases defined for a page being viewed (works best with 'Show more context' enabled in backlinks section).
 
-You may wish to exclude the aliases file itself from being linked during the auto-linking process by adding the following to aliases.md:
+When generating aliases.md, the script inserts the following text to exclude the term 'aliases' itself from being linked:
 ```
 aliases:
 - 
 ```
+
+Note: It is not recommended to edit the aliases file directly since it can be overwritten by running the script.
 
 ---
 # Obsidian Unlinker
@@ -144,18 +127,18 @@ After executing the script, it would be replaced with the following:
 
 These scripts can integrate nicely with [AutoHotKey](https://www.autohotkey.com/) for Windows.
 
-Linking (Ctrl+L links selected text):
+Linking (Shift+Ctrl+L links selected text):
 ```
-^l::
++^l::
 Clipboard=
 Send ^c
 RunWait, cmd.exe /c python obs-linkr.py c:\path\to\your\vault, c:\scripts\obs_tools\forward_linker, Hide
 Send ^v
 ```
 
-Unlinking (Ctrl+U unlinks selected text):
+Unlinking (Shift+Ctrl+U unlinks selected text):
 ```
-^u::
++^u::
 Clipboard=
 Send ^c
 RunWait, cmd.exe /c python obs-unlinkr.py c:\path\to\your\vault, c:\scripts\obs_tools\forward_linker, Hide
@@ -167,6 +150,4 @@ You'll have to modify the paths to match your own, and may need to add Python to
 ---
 # Notes
 
-This tool leverages an opinionated use case of Obsidian. Those who use literal text titles to identify their notes will find more utility than those who don't (eg. the zettelkasten folks), but using the aliases file strategically can handle a wide range of matching scenarios. If you have duplicated titles in your vault (ie. Obsidian prefixed them with a folder name due to ambiguity) you’ll only get links to the original (unqualified) page with that title.  
-
-Spec04 wrote a python script that generates the aliases.yml file from tags within your note files: [Obsidian Alias File Generator](https://github.com/Spec04/obs_alias_generator)
+If you have duplicated titles in your vault (ie. Obsidian prefixed them with a folder name due to ambiguity) you’ll only get links to the original (unqualified) page with that title.  
