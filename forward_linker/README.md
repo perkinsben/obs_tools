@@ -65,6 +65,25 @@ aliases: ["solving problems", "problem solve"]
 
 If the '-r' flag is provided on the command line, the script will generate an aliases file by searching each file in the vault for frontmatter aliases. If the '-r' flag is not passed on the command line, the existing aliases file will be used. Using the '-r' flag can speed the linking process up if there are many notes in your vault, or no aliases have changed since the last time the aliases file was generated.
 
+Adding an empty alias will prevent the title itself from being linked, yet still allow the aliases to be linked to the page.
+
+### Example
+
+Work.md
+```
+---
+aliases: ["", "workplace"]
+---
+```
+
+The text 'work' (case-insensitive) in this scenario will not be linked. This notation is captured in the aliases file as:
+
+```
+[[Work]]:
+- 
+- workplace
+```
+
 ## aliases.md vs aliases.yml
 
 By default, the script stores the parsed aliases in aliases.md at the root of the vault. You can choose to store the aliases in aliases.yml if desired by passing the '-y' flag on the commmand line. The format of both files is the same (standard YAML), except aliases.md supports wikilinks in titles (see below).
