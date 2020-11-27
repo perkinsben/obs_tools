@@ -50,7 +50,7 @@ After executing the script, it would be replaced with the following:
 ---
 # Aliases
 
-Aliases were introduced in Obsidian v0.9.16 and are defined in YAML frontmatter as described here: https://forum.obsidian.md/t/obsidian-release-v0-9-16/8795. Aliases are used when linking text so that alternate titles can link back to a central note.
+Aliases were introduced in Obsidian v0.9.16 and are defined in YAML frontmatter as described here: https://publish.obsidian.md/help/How+to/Add+aliases+to+note. Aliases are used when linking text so that alternate titles can link back to a central note.
 
 ### Example
 
