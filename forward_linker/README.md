@@ -63,7 +63,7 @@ aliases: ["solving problems", "problem solve"]
 ...note content here...
 ```
 
-If the '-r' flag is provided on the command line, the script will generate an aliases file by searching each file in the vault for frontmatter aliases. If the '-r' flag is not passed on the command line, the existing aliases file will be used. Using the '-r' flag can speed the linking process up if there are many notes in your vault, or no aliases have changed since the last time the aliases file was generated.
+If the '-r' flag is provided on the command line, the script will generate an aliases file by searching each file in the vault for frontmatter aliases. If the '-r' flag is not passed on the command line, the existing aliases file will be used.
 
 Adding an empty alias will prevent the title itself from being linked, yet still allow the aliases to be linked to the page.
 
