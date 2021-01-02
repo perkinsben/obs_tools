@@ -44,4 +44,4 @@ while True:
 pyperclip.copy(clip_txt)
 print(clip_txt)
 print('----------------------')
-print('linked text copied to clipboard')
+print('unlinked text copied to clipboard')
