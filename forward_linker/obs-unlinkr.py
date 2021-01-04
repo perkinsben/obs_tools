@@ -1,4 +1,4 @@
-# pip install pyperclip
+# pip3 install pyperclip
 import pyperclip
 import re
 

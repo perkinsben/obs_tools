@@ -17,7 +17,7 @@ This script does the following:
 * [PyYAML](https://pypi.org/project/PyYAML/)
 * [Python Frontmatter](https://pypi.org/project/python-frontmatter/)
 
-```pip install pyperclip pyyaml python-frontmatter```
+```pip3 install pyperclip pyyaml python-frontmatter```
 
 ## Running
 
@@ -125,7 +125,7 @@ It does not touch links of the type:
 * Python 3 + pip
 * [Pyperclip](https://pypi.org/project/pyperclip/) - Note that Mac and Linux may require installation of additional modules as per docs
 
-```pip install pyperclip```
+```pip3 install pyperclip```
 
 ## Running
 

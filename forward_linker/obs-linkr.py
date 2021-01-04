@@ -1,4 +1,4 @@
-# pip install pyperclip pyyaml python-frontmatter
+# pip3 install pyperclip pyyaml python-frontmatter
 import frontmatter
 import pyperclip
 import yaml
