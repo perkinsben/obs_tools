@@ -15,6 +15,7 @@ paragraph_mode = False
 yaml_mode = False
 regenerate_aliases = False
 
+
 def link_title(title, txt):
     updated_txt = txt
     # find instances of the title where it's not surrounded by [], | or other letters
@@ -34,20 +35,21 @@ def link_title(title, txt):
         # don't link if there's a ]] ahead, but no [[ (can happen with first few links)
         if not (next_opening_index == -1 and next_closing_index > -1):
             # proceed to link if no [[ or ]] ahead (first link) or [[ appears before ]]
-            if ((next_opening_index == -1 and next_closing_index == -1) or (next_opening_index < next_closing_index)):
+            if (next_opening_index == -1 and next_closing_index == -1) or (next_opening_index < next_closing_index):
                 updated_title = title
                 # handle aliases
-                if (title in page_aliases): updated_title = page_aliases[title]
+                if title in page_aliases: updated_title = page_aliases[title]
                 # handle the display text if it doesn't match the page title
-                if (txt_to_link != updated_title): updated_title += '|' + txt_to_link
+                if txt_to_link != updated_title: updated_title += '|' + txt_to_link
                 # create the link and update our text
                 updated_txt = updated_txt[:m.start() + offset] + '[[' + updated_title + ']]' + updated_txt[m.end() + offset:]
                 # change our offset due to modifications to the document
-                offset = offset + (len(updated_title) + 4 - len(txt_to_link)) # pairs of double brackets adds 4 chars
+                offset = offset + (len(updated_title) + 4 - len(txt_to_link))  # pairs of double brackets adds 4 chars
                 # if wikipedia mode is on, return after first link is created
                 if wikipedia_mode: return updated_txt
             
     return updated_txt
+
 
 def link_content(content):
     # make a copy of our content and lowercase it for search purposes
@@ -69,27 +71,28 @@ def link_content(content):
     
     return content
 
+
 # main entry point
 # validate obsidian vault location
-if (len(sys.argv) > 1):
+if len(sys.argv) > 1:
     obsidian_home = sys.argv[1]
     if not os.path.isdir(obsidian_home):
         print('folder specified is not valid')
         exit()
     
     # check for additional flags
-    if (len(sys.argv) > 2):
+    if len(sys.argv) > 2:
         for arg_index in range(2, len(sys.argv)):
             flag = sys.argv[arg_index]
 
-            if (flag) == "-w":
+            if flag == "-w":
                 wikipedia_mode = True
-            elif (flag) == "-p":
+            elif flag == "-p":
                 wikipedia_mode = True
                 paragraph_mode = True
-            elif (flag) == "-r":
+            elif flag == "-r":
                 regenerate_aliases = True
-            elif (flag) == "-y":
+            elif flag == "-y":
                 yaml_mode = True
 
 else:
@@ -112,19 +115,23 @@ for root, dirs, files in os.walk(obsidian_home):
             page_titles.append(page_title)
             
             # load yaml frontmatter and parse aliases
-            if (regenerate_aliases):
-                with open(root + "/" + file, encoding = "utf-8") as f:
-                    #print(file)        
-                    fm = frontmatter.load(f)
-                    
-                    if (fm and 'aliases' in fm):
-                        #print(fm['aliases'])
-                        generated_aliases[page_title] = fm['aliases']
+            if regenerate_aliases:
+                try:
+                    with open(root + "/" + file, encoding="utf-8") as f:
+                        #print(file)
+                        fm = frontmatter.load(f)
+                        
+                        if fm and 'aliases' in fm:
+                            #print(fm['aliases'])
+                            generated_aliases[page_title] = fm['aliases']
+                except yaml.YAMLError as exc:
+                    print("Error processing aliases in file: " + file)
+                    exit()
 
 # if -r passed on command line, regenerate aliases.yml
 # this is only necessary if new aliases are present
-if (regenerate_aliases):
-    with open(aliases_file, "w", encoding = "utf-8") as af:
+if regenerate_aliases:
+    with open(aliases_file, "w", encoding="utf-8") as af:
         for title in generated_aliases:
             af.write(title + ":\n" if yaml_mode else "[[" + title + "]]:\n")
             #print(title)
@@ -144,7 +151,7 @@ if os.path.isfile(aliases_file):
             aliases_txt = stream.read().replace("[[", "\"[[").replace("]]", "]]\"")
             aliases = yaml.full_load(aliases_txt)
             
-            if (aliases):
+            if aliases:
                 for title in aliases:         
                     if aliases[title]:                  
                         for alias in aliases[title]:
@@ -179,7 +186,7 @@ print('----------------------')
 # prepare our linked text output
 linked_txt = ""
 
-if (paragraph_mode):
+if paragraph_mode:
     for paragraph in clip_txt.split("\n"):
         linked_txt += link_content(paragraph) + "\n"
     linked_txt = linked_txt[:-1] # scrub the last newline
