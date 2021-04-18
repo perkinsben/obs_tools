@@ -31,6 +31,8 @@ This script does the following:
 
 ```-p = only the first occurrence of a page title (or alias) in each paragraph will be linked ('paragraph mode')```
 
+```-u = remove existing links in clipboard text before performing linking```
+
 ## Example
 
 Assuming you had the following pages in your Obsidian vault:

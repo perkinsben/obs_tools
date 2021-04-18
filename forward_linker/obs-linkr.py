@@ -5,6 +5,7 @@ import yaml
 import sys
 import os
 import re
+unlinkr = __import__('obs-unlinkr')
 
 page_titles = []
 page_aliases = {}
@@ -14,6 +15,7 @@ wikipedia_mode = False
 paragraph_mode = False
 yaml_mode = False
 regenerate_aliases = False
+clear_links = False
 
 
 def link_title(title, txt):
@@ -94,6 +96,8 @@ if len(sys.argv) > 1:
                 regenerate_aliases = True
             elif flag == "-y":
                 yaml_mode = True
+            elif flag == "-u":
+                clear_links = True
 
 else:
     print("usage - python obs-link.py <path to obsidian vault> [-r] [-y] [-w / -p]")
@@ -101,6 +105,7 @@ else:
     print("-y = use aliases.yml as aliases file instead of aliases.md")
     print("-w = only the first occurrence of a page title (or alias) in the content will be linked ('wikipedia mode')")
     print("-p = only the first occurrence of a page title (or alias) in each paragraph will be linked ('paragraph mode')")
+    print("-u = remove existing links in clipboard text before performing linking")
     exit()
 
 aliases_file = obsidian_home + "/aliases" + (".yml" if yaml_mode else ".md")
@@ -182,6 +187,13 @@ clip_txt = pyperclip.paste()
 #print('--- clipboard text ---')
 #print(clip_txt)
 print('----------------------')
+
+# unlink text prior to processing if enabled
+if (clear_links):
+    clip_txt = unlinkr.unlink_text(clip_txt)
+    #print('--- text after scrubbing links ---')
+    #print(clip_txt)
+    #print('----------------------')
 
 # prepare our linked text output
 linked_txt = ""
