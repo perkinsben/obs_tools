@@ -1,5 +1,7 @@
 # Obsidian Forward Linker
 
+*Update June 2021:* A new core Obsidian plugin [Outgoing Links](https://help.obsidian.md/Plugins/Outgoing+links) introduced in [Obsidian v0.12.4](https://forum.obsidian.md/t/obsidian-release-v0-12-4/18764) covers much of the functionality of this script. It can identify potential links in a document and provide one-click linking within the app. I'll still maintain this project, but I'd urge you to evaluate the new plugin to see if that meets your needs.  
+
 This script does the following:
 
 - Scans your vault location recursively for .md files and builds a list of note titles
