@@ -114,7 +114,8 @@ aliases_file = obsidian_home + "/aliases" + (".yml" if yaml_mode else ".md")
 # use it to build our list of titles and aliases
 for root, dirs, files in os.walk(obsidian_home):
     for file in files:
-        if file.endswith('.md'):
+        # ignore any 'dot' folders (.trash, .obsidian, etc.)
+        if file.endswith('.md') and '\\.' not in root and '/.' not in root:
             page_title = re.sub(r'\.md$', '', file)
             #print(page_title)
             page_titles.append(page_title)
