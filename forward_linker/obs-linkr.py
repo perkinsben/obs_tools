@@ -5,6 +5,7 @@ import yaml
 import sys
 import os
 import re
+from pathlib import Path
 unlinkr = __import__('obs-unlinkr')
 
 page_titles = []
@@ -16,7 +17,7 @@ paragraph_mode = False
 yaml_mode = False
 regenerate_aliases = False
 clear_links = False
-
+dont_use_orphans = True
 
 def link_title(title, txt):
     updated_txt = txt
@@ -74,6 +75,24 @@ def link_content(content):
     return content
 
 
+def build_links():
+    all_links = []
+    print("Building links cache...")
+    for root, dirs, files in os.walk(obsidian_home):
+        for file in files:
+            # ignore any 'dot' folders (.trash, .obsidian, etc.)
+            if file.endswith('.md') and '\\.' not in root and '/.' not in root:
+                with open(root + "/" + file, encoding="utf-8") as f:
+                    for line in f:
+                        matches = re.finditer('\[\[(.*?)\]\]', line)
+                        links = [line[m.start():m.end()].lower() for m in matches]
+                        all_links += [l.strip('[[').strip(']]').strip() for l in links]
+    with open('links.cache', 'w') as f:
+        for link in set(all_links):
+            f.write(link+'\n')
+    print("Links cache built.")
+
+            
 # main entry point
 # validate obsidian vault location
 if len(sys.argv) > 1:
@@ -98,6 +117,11 @@ if len(sys.argv) > 1:
                 yaml_mode = True
             elif flag == "-u":
                 clear_links = True
+            elif flag == "-x":
+                dont_use_orphans = True
+            elif flag == '-b':
+                build_links()
+                exit()
 
 else:
     print("usage - python obs-link.py <path to obsidian vault> [-r] [-y] [-w / -p]")
@@ -106,6 +130,8 @@ else:
     print("-w = only the first occurrence of a page title (or alias) in the content will be linked ('wikipedia mode')")
     print("-p = only the first occurrence of a page title (or alias) in each paragraph will be linked ('paragraph mode')")
     print("-u = remove existing links in clipboard text before performing linking")
+    print("-x = don't use orphan links when linking")
+    print("-b = build all links cache file and exit (ignores all other flags)")
     exit()
 
 aliases_file = obsidian_home + "/aliases" + (".yml" if yaml_mode else ".md")
@@ -178,7 +204,16 @@ if os.path.isfile(aliases_file):
 # append our aliases to the list of titles
 for alias in page_aliases:
     page_titles.append(alias)
+    
+# if links cache file exists add all links to page_titles for linking
+link_cache = Path('links.cache')
 
+if link_cache.exists() and not dont_use_orphans:
+    with open('links.cache', 'r') as f:
+        # remove new line
+        links = [line[:-1] for line in f]
+    page_titles += links
+    
 # sort from longest to shortest page titles so that we don't
 # identify scenarios where a page title is a subset of another
 page_titles = sorted(page_titles, key=lambda x: len(x), reverse=True)
