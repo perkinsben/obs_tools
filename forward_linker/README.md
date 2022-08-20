@@ -5,9 +5,10 @@
 This script does the following:
 
 - Scans your vault location recursively for .md files and builds a list of note titles
+- Scans all your files for any orphan links and add them to the previously built titles.  
 - Optionally builds a list of title aliases by scanning YAML frontmatter in notes
 - Sorts the titles from longest to shortest
-- Pulls the text from your clipboard
+- Pulls the text from your clipboard or the whole vault.
 - Searches through that text for instances of the titles
 - Replaces the text with the link (includes handling of differing case)
 - Pushes the linked text back to the clipboard
@@ -34,6 +35,12 @@ This script does the following:
 ```-p = only the first occurrence of a page title (or alias) in each paragraph will be linked ('paragraph mode')```
 
 ```-u = remove existing links in clipboard text before performing linking```
+
+```-x = don't use orphan links when linking```
+
+```-b = rescans the vault for all links (orphan or otherwise)```
+
+```-v = run linker on the whole vault (default is to run on clipboard)```
 
 ## Example
 
